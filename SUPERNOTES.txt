@@ -1,0 +1,70 @@
+=================================================
+3:30 PM - 5.00 PM - Discussion and Demo
+5:00 PM - 5:15 PM - Break
+5:15 PM - 6:30 PM - Lab Time
+6:30 PM - 7:30 PM - Discussion and Demo
+5:00 PM - 5:15 PM - Break
+7:30 PM - 8:30 PM - Lab Time
+8:30 PM - 9:30 PM - Project Specific Questions Hour
+
+
+How many of you NOT having prior knowledge of Docker? - 13/21
+How many of you NOT having prior knowledge of Kubernetes? - 13/21
+====================================
+Demo platform - AWS
+Lab - AWS
+----------------------
+	-Rajesh Kumar
+
+
+Why Monitoring?
+===================
+What is Time Series DB and Why
+======================
+What is prometheus
+Why prometheus?
+prometheus Architecture
+prometheus terminology
+How prometheus works!!
+Source from prometheus Pulll a data
+		Push Mgr
+		Exporter
+		Client Lib
+		Service Discivery
+prometheus store a data in timeseries fasion.
+	each insert has
+metric(key-value,key-value,key-value,)=value
+
+Visualization
+	PromlQl with build in web UI
+	grafana
+	API
+
+=====================================
+Prom Server - Linux
+- 35.154.125.95
+- ec2-user
+http://35.154.125.95:9090/graph
+
+	Exporter - Node - Linux 
+	Exporter - WMI - Windowss	
+	
+PROM QL with a help of WEB UI.
+
+
+==============
+Sc1 - LINUX - 100 KNOWN (Exporter Developer - 
+			M1 - Counter
+			m2 - Ga
+Sc2 - Your APP 
+		m1
+		m2 - 
+=========================
+Node Exporter  - 35.154.125.95 - LINUX
+
+
+
+
+QA
+Influs vs Prom
+===============================
