@@ -1,0 +1,8 @@
+How to download and Install Prom
+===========================================
+cd
+yum install wget -y
+tar -zxvf prometheus-2.17.1.linux-amd64.tar.gz
+cd prometheus-2.17.1.linux-amd64
+ls 
+./prometheus --config.file="prometheus.yml"
