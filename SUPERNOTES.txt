@@ -62,6 +62,8 @@ Sc2 - Your APP
 =========================
 Node Exporter  - 35.154.125.95 - LINUX
 
+How to reload prom config file?
+$ kill -HUP 9783
 
 
 
