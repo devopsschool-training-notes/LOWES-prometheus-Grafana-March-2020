@@ -26,7 +26,7 @@ Why prometheus?
 prometheus Architecture
 prometheus terminology
 How prometheus works!!
-Source from prometheus Pulll a data
+Source from prometheus Pull a data
 		Push Mgr
 		Exporter
 		Client Lib
@@ -65,7 +65,32 @@ Node Exporter  - 35.154.125.95 - LINUX
 How to reload prom config file?
 $ kill -HUP 9783
 
+Public DNS	ec2-13-235-246-208.ap-south-1.compute.amazonaws.com
+User name	Administrator
+Password	
+u3NdixTYnivsF6.?tR2u.6cyfJXj$fDA
 
+http://13.235.246.208:9182
+http://172.31.20.76:9182/metrics
+
+  - job_name: 'win-exporter'
+    static_configs:
+    - targets: ['172.31.20.76:9182']
+
+
+ 141  ls
+  142  vi prometheus.yml
+  143  ps -eaf | grep prom
+  144  kil -HUP 9783
+  145  kill -HUP 9783
+  146  history
+==========================================================s
+
+
+user name - ec2-user
+KEY PPK for putty = rajesh-mumbai.ppk
+KEY PEM for SSH - rajesh-mumbai.pem
+LOCATION - https://www.devopsschool.com/notes/docker/2019/
 
 QA
 Influs vs Prom
