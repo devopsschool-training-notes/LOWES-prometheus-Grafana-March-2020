@@ -108,6 +108,95 @@ groups:
 ./promtool check rules prometheus_rules.yml
 
 
+Alerting rule?
+https://www.devopsschool.com/blog/working-with-prometheus-alert-manager-tutorials/
+
+=================================================
+Step 1- Add a Alert rule in prometheus_rules.yml
+
+Step 2 - enable prometheus_rules.yml in prometheus.yml
+
+Step 3 - Install Alert Manager 
+
+Step 4 - modify alertmanager.yml with 
+
+[root@ip-172-31-22-231 alertmanager]# more alertmanager.yml
+route:
+  group_by: ['alertname']
+  receiver: smtp-local
+receivers:
+  - name: 'smtp-local'
+    email_configs:
+    - to: 'rajesh@scmgalaxy.com'
+      from: 'contact@devopsschool.com'
+      require_tls: false
+      smarthost: localhost:25
+      send_resolved: true
+
+Step 5 - start  alertmanager
+
+Step 6 - modify prometheus.yml and add alertmanager
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+      - localhost:9093
+
+
+REF
+https://www.devopsschool.com/blog/recording-rules-and-alerting-rules-exmplained-in-prometheus/
+https://www.devopsschool.com/blog/working-with-prometheus-alert-manager-tutorials/
+
+===============================================
+======================================================
+===============================================
+======================================================
+ROUGH WORK
+===============================================
+======================================================
+[Unit]
+Description=Prometheus Alert Manager Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/alertmanager/alertmanager \
+        --config.file=/usr/local/bin/alertmanager/alertmanager.yml \
+        --web.external-url=https://172.31.22.231/alertmanager \
+        --web.route-prefix=/
+
+[Install]
+WantedBy=multi-user.target
+
+======================================================
+$ yum install mailx
+echo "THIS IS A TEST EMAIL" | mail -s "Enter the subject" rajesh@scmgalaxy.com
+sendmail rajesh@scmgalaxy.com < fff.txt
+======================================================
+http://35.154.125.95:9093/api/v1/alerts
+
+  - name: alert_rules
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance [{{ $labels.instance }}] down"
+          description: "[{{ $labels.instance }}] of job [{{ $labels.job }}] has been down for more than 1 minute."
+
+======================================================
+
+
+
+
+
+
+
+
+
 
 
 
