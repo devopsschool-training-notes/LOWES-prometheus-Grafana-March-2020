@@ -1,0 +1,227 @@
+This should return a number of different time series (along with the latest value recorded for each), all with the metric name promhttp_metric_handler_requests_total, but with different labels. These labels designate different requests statuses.
+
+Instant vector and Instant vector with Filter
+=============================================================================
+promhttp_metric_handler_requests_total
+scrape_duration_seconds{instance="localhost:9100"}
+promhttp_metric_handler_requests_total{code="200",instance="localhost:9100",job="node-exporter"}
+scrape_duration_seconds
+scrape_duration_seconds{instance="172.31.20.76:9182",job="win-exporter"}
+node_cpu_seconds_total
+node_cpu_seconds_total{cpu="0",instance="localhost:9100",job="node-exporter",mode="nice"}
+# If we were only interested in requests that resulted in HTTP code 200, we could use this query to retrieve that information:
+promhttp_metric_handler_requests_total{code="200"}
+promhttp_metric_handler_requests_total{code="200",job="node-exporter"}
+
+Instant vector and Instant vector with Filter using regular Expresson
+=============================================================================
+scrape_duration_seconds{instance="localhost:9100"}
+scrape_duration_seconds{instance=~".*9100"}
+promhttp_metric_handler_requests_total{code="200",instance="localhost:9100",job="node-exporter"}
+promhttp_metric_handler_requests_total{code="200",instance="localhost:9100",job=~".*exporter"}
+scrape_duration_seconds{instance="172.31.20.76:9182",job="win-exporter"}
+scrape_duration_seconds{instance="172.31.20.76:9182",job=~"win.*"}
+node_cpu_seconds_total
+node_cpu_seconds_total{mode="irq"}
+node_cpu_seconds_total{mode=~".*irq"}
+prometheus_http_requests_total{job=~".*server"}
+
+Range Vector with filter
+=============================================
+promhttp_metric_handler_requests_total[10m]
+scrape_duration_seconds{instance="localhost:9100"}[10m]
+promhttp_metric_handler_requests_total{code="200",instance="localhost:9100",job="node-exporter"}[200s]
+scrape_duration_seconds[200s]
+scrape_duration_seconds{instance="172.31.20.76:9182",job="win-exporter"}[200s]
+node_cpu_seconds_total[3h]
+node_cpu_seconds_total{cpu="0",instance="localhost:9100",job="node-exporter",mode="nice"}[3h]
+# If we were only interested in requests that resulted in HTTP code 200, we could use this query to retrieve that information:
+promhttp_metric_handler_requests_total{code="200"}[1d]
+promhttp_metric_handler_requests_total{code="200",job="node-exporter"}[1d]
+
+
+offset example
+=======================
+prometheus_http_requests_total
+prometheus_http_requests_total{code="200",handler="/metrics",instance="localhost:9090",job="prometheus"}
+prometheus_http_requests_total{code="200",handler="/metrics",instance="localhost:9090",job="prometheus"} offset 5m
+prometheus_http_requests_total offset 5m
+
+
+Scalar Example
+===============================
+sum(rate(prometheus_http_requests_total[5m] offset 5m))
+
+Sub Queries
+===============================
+node_netstat_Tcp_InSegs
+node_netstat_Tcp_InSegs{instance="localhost:9100",job="node-exporter"}
+rate(node_netstat_Tcp_InSegs{instance="localhost:9100",job="node-exporter"}[5m])
+
+rate(node_netstat_Tcp_InSegs[1m])
+ceil(rate(node_netstat_Tcp_InSegs[1m]))
+deriv(ceil(rate(node_netstat_Tcp_InSegs[1m]))[1m:])
+
+aggregation operators.
+===============================
+To count the number of returned time series, you could write:
+promhttp_metric_handler_requests_total
+count(promhttp_metric_handler_requests_total)
+
+
+Functions
+===============================
+rate(promhttp_metric_handler_requests_total)	#Error
+rate(promhttp_metric_handler_requests_total{code="200"}[1m])
+# The average amount of CPU time spent in system mode, per second, over the last minute (in seconds)
+rate(node_cpu_seconds_total{mode="system"}[1m])
+
+# The average network traffic received, per second, over the last minute (in bytes)
+rate(node_network_receive_bytes_total[1m])
+
+rate(scrape_duration_seconds{instance="localhost:9100"}[1m:20s])
+
+# Usability of such graphs is close to zero, because they show hard-to-interpret constantly growing counter values, while we need graphs for network bandwidth — see MB/s on the left of the graph. PromQL has a magic function for this — rate(). It calculates per-second rate for all the matching time series:
+rate(node_network_receive_bytes_total[5m])
+
+aggregation operatos with Functions
+===============================
+sum by (job) (
+  rate(prometheus_http_requests_total[5m])
+)
+
+
+
+A set of time series containing a range of data points over time for each time series. Return a whole range of scrape_duration_seconds (in this case 5 minutes) for the same vector, making it a range vector.
+promhttp_metric_handler_requests_total[5m]
+node_netstat_Tcp_InSegs{instance="localhost:9100"}[5m] 
+node_netstat_Tcp_InSegs{instance="localhost:9100"}[1m] 
+node_netstat_Tcp_InSegs{instance="localhost:9100"}[30s]
+
+Return all time series with the metric http_requests_total:
+prometheus_http_requests_total
+
+Return all time series with the metric http_requests_total and the given job and handler labels:
+prometheus_http_requests_total{job="apiserver", handler="/api/comments"}
+
+Return a whole range of time (in this case 5 minutes) for the same vector, making it a range vector:
+prometheus_http_requests_total{job="apiserver", handler="/api/comments"}[5m]
+
+Note that an expression resulting in a range vector cannot be graphed directly, but viewed in the tabular ("Console") view of the expression browser.
+
+Using regular expressions, you could select time series only for jobs whose name match a certain pattern, in this case, all jobs that end with server:
+
+
+To select all HTTP status codes except 4xx ones, you could run:
+prometheus_http_requests_total{status!~"4.."}
+
+Subquery- Return the 5-minute rate of the http_requests_total metric for the past 30 minutes, with a resolution of 1 minute.
+rate(prometheus_http_requests_total[5m])[30m:1m]
+
+This is an example of a nested subquery. The subquery for the deriv function uses the default resolution. Note that using subqueries unnecessarily is unwise.
+max_over_time(deriv(rate(distance_covered_total[5s])[30s:5s])[10m:])
+
+Using functions, operators, etc - Return the per-second rate for all time series with the http_requests_total metric name, as measured over the last 5 minutes:
+rate(prometheus_http_requests_total[5m])
+
+Assuming that the http_requests_total time series all have the labels job (fanout by job name) and instance (fanout by instance of the job), we might want to sum over the rate of all instances, so we get fewer output time series, but still preserve the job dimension:
+sum by (job) (
+  rate(prometheus_http_requests_total[5m])
+)
+
+
+
+
+The filesystem space available to non-root users (in bytes)
+node_filesystem_avail_bytes
+
+
+
+Filtering by label- A single metric name may correspond to multiple time series with distinct label sets as in the example above. How to select time series matching only {device="eth1"}? Just mention the required label in the query:
+node_network_receive_bytes_total{device="eth1"}
+
+If you want selecting all the time series for devices other than eth1, then just substitute = with != in the query:
+node_network_receive_bytes_total{device!="eth1"}
+
+How to select time series for devices starting with eth? Just use regular expressions:
+node_network_receive_bytes_total{device=~"eth.+"}
+
+For selecting all the time series for devices not starting with eth, the =~ must be substituted with !~:
+node_network_receive_bytes_total{device!~"eth.+"}
+
+Filtering by multiple labels
+Label filters may be combined. For instance, the following query would return only time series on the instance node42:9100 for devices starting with eth:
+node_network_receive_bytes_total{instance="node42:9100", device=~"eth.+"}
+
+Filtering by regexps on metric name
+Sometimes it is required returning all the time series for multiple metric names. Metric name is just an ordinary label with a special name — __name__. So filtering by multiple metric names may be performed by applying regexps on metric names. For instance, the following query returns all the time series with node_network_receive_bytes_total or node_network_transmit_bytes_total metric names:
+{__name__=~"node_network_(receive|transmit)_bytes_total"}
+
+Comparing current data with historical data
+PromQL allows querying historical data and combining / comparing it to the current data. Just add offset to the query. For instance, the following query would return week-old data for all the time series with node_network_receive_bytes_total name:
+node_network_receive_bytes_total offset 7d
+
+
+
+If we have two different metrics with the same dimensional labels, we can apply binary operators to them and elements on both sides with the same label set will get matched and propagated to the output. For example, this expression returns the unused memory in MiB for every instance (on a fictional cluster scheduler exposing these metrics about the instances it runs):
+(instance_memory_limit_bytes - instance_memory_usage_bytes) / 1024 / 1024
+
+The same expression, but summed by application, could be written like this:
+sum by (app, proc) (
+  instance_memory_limit_bytes - instance_memory_usage_bytes
+) / 1024 / 1024
+
+we could get the top 3 CPU users grouped by application (app) and process type (proc) like this:
+topk(3, sum by (app, proc) (rate(instance_cpu_time_ns[5m])))
+
+Assuming this metric contains one time series per running instance, you could count the number of running instances per application like this:
+count by (app) (instance_cpu_time_ns)
+========================================================================
+========================================================================
+
+String literals
+Float literals
+Instant vector Selectors
+Range Vector Selectors
+Offset modifier
+Subquery
+Operators
+Functions
+========================================================================
+========================================================================
+
+Now that we have at least 2 scape targets, we can begin to run some more interesting queries that involve multiple scrape targets.
+scrape_duration_seconds
+
+This shows 2 time series results. 1 for each target,
+
+we can filter for 1 target by including either the instance, or job labels
+scrape_duration_seconds{instance="localhost:9100"}
+
+Regular Expressions
+node_cpu_seconds_total{mode=~".*irq"}
+
+Instant vector
+`scrape_duration_seconds{instance="localhost:9100"}
+
+Range Vector
+node_netstat_Tcp_InSegs{instance="localhost:9100"}[5m] 
+node_netstat_Tcp_InSegs{instance="localhost:9100"}[1m] 
+node_netstat_Tcp_InSegs{instance="localhost:9100"}[30s]
+
+Functions
+
+sum(go_threads)
+
+
+
+
+
+Reference
+https://prometheus.io/docs/prometheus/latest/querying/examples/
+https://timber.io/blog/promql-for-humans/
+https://prometheus.io/docs/introduction/first_steps/
+https://medium.com/@valyala/promql-tutorial-for-beginners-9ab455142085
+https://prometheus.io/docs/prometheus/latest/querying/basics/
+https://sbcode.net/prometheus/example-queries/
+https://files.timber.io/pdfs/PromQL+Cheatsheet.pdf
