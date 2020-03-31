@@ -91,6 +91,43 @@ user name - ec2-user
 KEY PPK for putty = rajesh-mumbai.ppk
 KEY PEM for SSH - rajesh-mumbai.pem
 LOCATION - https://www.devopsschool.com/notes/docker/2019/
+==================================================================
+Working with Recording rule
+https://www.devopsschool.com/blog/recording-rules-and-alerting-rules-exmplained-in-prometheus/
+
+
+
+groups:
+  - name: custom_rules
+    rules:
+      - record: instance_path:requests:rate5m
+        expr: sum(rate(prometheus_http_requests_total[5m] offset 5m))
+      - record: node_memory_MemFree_percent
+        expr: 100 - (100 * node_memory_MemFree_bytes / node_memory_MemTotal_bytes)
+
+./promtool check rules prometheus_rules.yml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 QA
 Influs vs Prom
