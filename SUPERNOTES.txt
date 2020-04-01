@@ -188,10 +188,265 @@ http://35.154.125.95:9093/api/v1/alerts
           description: "[{{ $labels.instance }}] of job [{{ $labels.job }}] has been down for more than 1 minute."
 
 ======================================================
+prometheus_rules.yml file 
+
+groups:
+  - name: custom_rules
+    rules:
+      - record: instance_path:requests:rate5m
+        expr: sum(rate(prometheus_http_requests_total[5m] offset 5m))
+      - record: node_memory_MemFree_percent
+        expr: 100 - (100 * node_memory_MemFree_bytes / node_memory_MemTotal_bytes)
+  - name: alert_rules
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance [{{ $labels.instance }}] down"
+          description: "[{{ $labels.instance }}] of job [{{ $labels.job }}] has been down for more than
+ 1 minute."
+
+=================================================================================================
+=================================================================================================
+13 people 19 people - DONT know containers
+13 People 19 people - dont know k8s
+=======================================================
+Crash Course of Docker
+Crash course of K8s.
+=======================================
+https://www.devopsschool.com/videos/
+==================================================================
+How do you reduce software running cost?
+
+What is Docker?
+====================
+	Container mgmt tool.
+	Free	
+	Open source
+	Go
+	
+
+What is Container?
+====================================================
+	Light weight app run time env.
+	User space
+		with their
+			OWN 	
+				Network
+				MOUNT
+				PMAP
+
+OS
+	KERNAL
+		CGROUP ----RAM CPU to PS of host.
+		NAMESPACE
+			NET ---> 1	ONE USER + 2  + s3
+			MNT ---- 1
+			USER	MUL
+			PMAP -- 1
+
+		Docker
+			Cont1	
+				NET ---> 1	
+				MNT ---- 1
+				USER	1
+				PMAP -- 1	
+			Cont2	
+				NET ---> 1	
+				MNT ---- 1
+				USER	1
+				PMAP -- 1
+=====================================================
+How to install docker?
+https://www.devopsschool.com/tutorial/docker/install-config/docker-install-commuityedition-centos-rhel.html
+13.233.87.32
+sudo -s
+ 353  sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+  354  sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  355  sudo yum install –y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  356  sudo yum-config-manager --enable rhui-REGION-rhel-server-extras
+  357  sudo yum install -y docker-ce
+  358  docker
+  359  sudo systemctl enable docker
+  360  sudo systemctl start docker
+  361  clear
+  362  docker inof
+  363  docker info
+  364  hsitory
+  365  history
+
+Basic workflow of the container?
+===================================
+Pull ->	Create -> Start -> Stop -> restart -> Pause -> unpause -> kill -> remove
+-----------------------
+	run
+
+364  hsitory
+  365  history
+  366  clear
+  367  clear
+  368  clear
+  369  ls
+  370  docker  pull nginx
+  371  docker images
+  372  docker ps
+  373  docker ps -a
+  374  clear
+  375  docker images
+  376  docker help
+  377  docker help | grep ps
+  378  clear
+  379  ls
+  380  docker ps -a
+  381  docker create nginx
+  382  docker ps -a
+  383  doker start c8129dc70ae9
+  384  docker start c8129dc70ae9
+  385  docker ps -a
+  386  docker stop c8129dc70ae9
+  387  clear
+  388  docker ps -a
+  389  docker restart c8129dc70ae9
+  390  docker ps -a
+  391  docker pause c8129dc70ae9
+  392  docker ps -a
+  393  docker unpause c8129dc70ae9
+  394  clear
+  395  docker ps -a
+  396  docker kill c8129dc70ae9
+  397  docker ps -a
+  398  docker rm c8129dc70ae9
+  399  history
+
+How to use it?
+	How to go inside a container?
+	$ docker exec -it a39509768e87 /bin/bash
+	
+	How to acess from outside?
+ 395  docker ps -a
+  396  docker kill c8129dc70ae9
+  397  docker ps -a
+  398  docker rm c8129dc70ae9
+  399  history
+  400  clear
+  401  docker ps -a
+  402  docker run -d nginx
+  403  docker ps
+  404  docker run -d nginx
+  405  docker run -d nginx
+  406  docker ps -a
+  407  clear
+  408  ls
+  409  docker ps -a
+  410  docker run -d nginx
+  411  docker ps -a
+  412  clear
+  413  ls
+  414  docker ps -a
+  415  docker inspect a39509768e87 | grep -i ip
+  416  docker inspect 93f81b69b240 | grep -i ip
+  417  clear
+  418  ls
+  419  curl http://172.17.0.4
+  420  curl http://172.17.0.3
+  421  curl http://172.17.0.2
+  422  hsitory
 
 
+How to use container?
+==================================
+https://www.devopsschool.com/tutorial/docker/commands/index.html
 
 
+How to monitor docker and their containes using prometheus
+===================================================
+Step 1 - Stop a docker
+systemctl stop docker
+
+Step 2 - create a deamon.json file and add some enrty....
+
+What is deamon.json?
+=========================
+Docker can be config  2 Way
+		Command line
+		deamon.json [ config file]
+		https://www.devopsschool.com/blog/example-of-daemon-json-or-docker-conf-complete-options/
+
+vi /etc/docker/daemon.json
+
+{
+  "metrics-addr" : "127.0.0.1:9323",
+  "experimental" : true
+}
+
+Step 3 - Start a docker.
+systemctl start docker
+
+Step 4 - Access a endpoint of Docker Matrixx
+curl localhost:9323/metrics
+
+Step 5 - Add a Docker endpoint matric to prometheus
+
+  - job_name: 'docker'
+         # metrics_path defaults to '/metrics'
+         # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9323']
+
+			
+
+Where to run APP?----------------------->
+=======================================================================
+PHYSICAL Machine --->	VIRTUAL MACHINE --->
+	----
+	200
+	-----
+	85% Waste   ->   15%
+	-----
+	C + M + stO
+
+How to run cAdvisor?
+
+https://www.devopsschool.com/blog/understand-docker-volume-from-beginner-to-deep-dive-level/
+
+docker run \
+--volume=/:/rootfs:ro \
+--volume=/var/run:/var/run:rw \
+--volume=/sys:/sys:ro \
+--volume=/var/lib/docker/:/var/lib/docker:ro \
+--volume=/dev/disk/:/dev/disk:ro \
+--publish=8080:8080 \
+--detach=true \
+--name=cadvisor \
+google/cadvisor:v0.28.3
+
+
+docker run \
+--volume=/:/rootfs:ro \
+--volume=/var/run:/var/run:rw \
+--volume=/sys:/sys:ro \
+--volume=/var/lib/docker/:/var/lib/docker:ro \
+--volume=/dev/disk/:/dev/disk:ro \
+--publish=8080:8080 \
+--detach=true \
+--name=cadvisor \
+google/cadvisor
+
+http://13.233.87.32:8080/
+
+
+http://13.233.87.32:8080/
+
+
+- job_name: cadvisor
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - 13.233.87.32:8080
 
 
 
