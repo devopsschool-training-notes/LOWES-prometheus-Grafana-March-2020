@@ -449,6 +449,195 @@ http://13.233.87.32:8080/
     - 13.233.87.32:8080
 
 
+==================================================================
+=====================================================================s
+What is Kubernetes?
+	its container orch tool.
+	microservices orch tool.
+
+
+Why Kubernetes?
+https://www.devopsschool.com/videos
+
+Kubernetes Arch aks k8s clustor?
+
+MASTER
+	Api Server
+	ETCD
+	Controller
+	Schedular
+
+WOrker
+	Kubelet
+	Kube proxy
+	Docker Engines
+
+Work Station
+	Kubectl
+
+	
+1 - YAML  - KIND - POD -> Container -> Image -> Docker hub -> Dockerfile
+10  YAML  - KIND - DEPLOYMENT
+
+LOAD Balancer all these 10 PODS ---> service
+
+========================================================
+
+
+Prometheus ---> Kubernetes 
+			Services - PODS
+
+Pre
+===========================================
+- k8s clustor
+- Kubernetes Operators - Prometheus using helm
+- Deployment - POD --YOUR APP.
+=================================================================s
+
+Setting up k8s clus using kubeadm.
+--------------------------------------
+https://www.devopsschool.com/blog/setting-up-kubernetes-clusters-using-kubeadm-manual-way-in-rhel-7-centos7/
+Master + Work station - 52.66.50.245
+Worker - 13.233.51.202
+
+
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 172.31.25.230:6443 --token k852a4.8h3xplhtmjj0b1tb \
+    --discovery-token-ca-cert-hash sha256:a23abd25fc57e69c2078ca2ef04fba4af6778e4fdc15a40ebfd0f0ecefb86567
+
+
+How to install prometheus to monitor kubernetes using help.
+=============================================================
+https://www.devopsschool.com/tutorial/kubernetes/kubernetes-monitoring-with-prometheus-grafana.html
+https://itnext.io/kubernetes-monitoring-with-prometheus-in-15-minutes-8e54d1de2e13
+	
+
+helm install stable/prometheus --generate-name
+
+ pod has unbound immediate PersistentVolumeClaims
+
+
+LAST DEPLOYED: Wed Apr  1 15:00:12 2020
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+The Prometheus server can be accessed via port 80 on the following DNS name fromster:
+prometheus-1585753210-server.default.svc.cluster.local
+
+
+Get the Prometheus server URL by running these commands in the same shell:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus,comp jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace default port-forward $POD_NAME 9090
+
+
+The Prometheus alertmanager can be accessed via port 80 on the following DNS namur cluster:
+prometheus-1585753210-alertmanager.default.svc.cluster.local
+
+
+Get the Alertmanager URL by running these commands in the same shell:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus,comper" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace default port-forward $POD_NAME 9093
+################################################################################
+######   WARNING: Pod Security Policy has been moved to a global property.  ####
+######            use .Values.podSecurityPolicy.enabled with pod-based      ####
+######            annotations                                               ####
+######            (e.g. .Values.nodeExporter.podSecurityPolicy.annotations) ####
+################################################################################
+
+
+The Prometheus PushGateway can be accessed via port 9091 on the following DNS naour cluster:
+prometheus-1585753210-pushgateway.default.svc.cluster.local
+
+
+Get the PushGateway URL by running these commands in the same shell:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus,compy" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace default port-forward $POD_NAME 9091
+
+For more information on running Prometheus, visit:
+https://prometheus.io/
+
+ $HOME/.config/helm             | $HOME/.local/share/helm |
+
+
+
+
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: hostpath
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/devopsschool"
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: hostpath
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/devopsschool"
+
+
+===============================================
+Docker Engine - prometheus...using docker.json.
+
+Docker Container - cadvior
+=====================================================
+Kubernetes Services - prometheus with a help of Operators
+
+Kubernetes PODS - prometheus with a help of Operators
+
+VM
+   ---> Node Exporter				- METRIC		--- Prom
+   ---> Docker -> Docker Endpoint		- METRIC		--- Prom
+	---> Container with a help of CGROUP>
+					- cAdvisor	- METRIC	--- Prom
+======================================================================================
+How to montor services and How to monitor PODS?
+Prom ---> ServiceDiscovery ---> API Server 
+
+
+Prom --->	
+		API
+		CERT
+		TOKENT
+
+prometheus 
+	server - img - cont - pod
+	alert
+	pushmgmt
+	db
+	
 
 
 
@@ -458,21 +647,200 @@ http://13.233.87.32:8080/
 
 
 
+https://github.com/coreos/prometheus-operator
 
 
+kubectl --namespace default port-forward promtheus-prometheus-opera-operator-685cf9787-cnl85 9090
+
+# DID NIT Worked for me... During Demo with latest version of Kubernetes
+helm install promtheus stable/prometheus-operator
+
+# Worked for me... During Demo with latest version of Kubernetes
+helm install name my-release stable/prometheus
 
 
-
-
-
-
-
-
-
-
-
+===========================ROUG=================================================
+============================================================================
+kubectl create -f - <<EOF
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv-volume1
+spec:
+  storageClassName:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/pv1"
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv-volume2
+spec:
+  storageClassName:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/tmp/pv2"
+EOF
 
 
 QA
 Influs vs Prom
 ===============================
+
+
+# Running Prometheus on Kubernetes
+
+# Install Helm
+
+
+```
+
+wget https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz
+
+
+tar -xzvf helm-v2.11.0-linux-amd64.tar.gz
+
+sudo mlinux-amd64/helm /usr/local/bin/helm
+
+kubectl create -f https://raw.githubusercontent.com/wardviaene/kubernetes-course/master/helm/helm-rbac.yaml
+
+helm init --service-account tiller 
+```
+## Start Prometheus (without storage)
+```
+
+helm install --name prometheus --set server.persistentVolume.enabled=false,alertmanager.persistentVolume.enabled=false stable/prometheus
+```
+
+
+## Exposing prometheus port
+
+```
+
+export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus,component=server" -o jsonpath="{.items[0].metadata.name}")
+
+kubectl --namespace default port-forward $POD_NAME 9090 &
+
+socat TCP4-LISTEN:9091,fork TCP4:localhost:9090 &
+
+```
+
+=========================================================
+
+Client LIB in Java
+============================
+Step 1 - Know you app well.
+
+Step 2 - Decide what metrices you want from Appps?
+
+Step 3 - Instrument your code using client lib.
+==========================================
+- Add prom lib in pom.xml
+- build it...
+	You get a App pack...
+- Run apps..
+	
+
+Step 4 - Add a code which would get 4 type of metrices from app and send to Prom...s
+
+
+=======================================================================================================================================
+Graphna
+============================================================================================================
+
+13.232.133.183
+
+
+
+    6  clear
+    7  cd
+    8  ls
+    9  cd wget https://dl.grafana.com/oss/release/grafana-6.7.2-1.x86_64.rpm
+   10  wget https://dl.grafana.com/oss/release/grafana-6.7.2-1.x86_64.rpm
+   11  yum install wget -y
+   12  clear
+   13  ls
+   14  wget https://dl.grafana.com/oss/release/grafana-6.7.2-1.x86_64.rpm
+   15  sudo yum install grafana-6.7.2-1.x86_64.rpm
+   16  cler
+   17  ls
+   18  clear
+   19  ls
+   20  sudo systemctl daemon-reload
+   21  sudo systemctl start grafana-server
+   22  sudo systemctl status grafana-server
+   23  clear
+   24  ls
+   25  history
+
+
+Package details
+Installs binary to /usr/sbin/grafana-server
+Copies init.d script to /etc/init.d/grafana-server
+Installs default file (environment vars) to /etc/sysconfig/grafana-server
+Copies configuration file to /etc/grafana/grafana.ini
+Installs systemd service (if systemd is available) name grafana-server.service
+The default configuration uses a log file at /var/log/grafana/grafana.log
+The default configuration specifies an sqlite3 database at /var/lib/grafana/grafana.db
+
+
+
+============================================
+How to use grafanaf for managing org - team - user?
+========================================================
+What is Org?
+	INFY
+
+ONE grafana
+========================================================
+		- Client 1
+			List of Source of Metrics
+			Team
+			Users
+		- Client 2 
+			List of Source of Metrics
+			Team
+			Users
+		- Client 3
+			List of Source of Metrics
+			Team
+			Users
+
+===============================
+How?
+	Organization
+		LOWESX-Org
+			LOWESX-Dev
+			LOWESX-QA
+		LOWESY-Org
+
+Organization would have separate
+		List of Data Source
+		Team
+		Users
+		Plugins
+		Dashboard
+		Alerts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
