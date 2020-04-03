@@ -732,7 +732,7 @@ socat TCP4-LISTEN:9091,fork TCP4:localhost:9090 &
 
 ```
 
-=========================================================
+======================================s===================
 
 Client LIB in Java
 ============================
@@ -828,6 +828,36 @@ Organization would have separate
 		Plugins
 		Dashboard
 		Alerts
+=============================================================
+Folder
+	Dashboard
+		ROW
+			PANEL	
+				DIFF TYPE OF PANEL(DATA)
+					QUErY1
+					QUErY2
+			PANEL	
+			PANEL	
+			PANEL	
+
+
+PANEL	 - GRAPH
+
+============================================
+35.154.170.24		k8 WS 
+================
+	http://35.154.170.24:9091/	Prometheus-k8s
+
+
+52.66.208.12		ps		NA
+13.235.133.187		NE
+http://13.235.133.187:9100/metrics
+
+13.232.37.136		PS - PUSH GTW
+http://13.232.37.136:9090/graph
+
+13.233.87.251 		- WIN NodeE
+
 
 
 
